@@ -352,6 +352,11 @@ bool FMUWrapper::setRealParameter(const std::string& var, double value)
   return true;
 }
 
+std::vector<Variable> FMUWrapper::getAllVariables()
+{
+  return allVariables;
+}
+
 void FMUWrapper::getDependencyGraph_outputs()
 {
   size_t *startIndex, *dependency;
@@ -771,11 +776,13 @@ void FMUWrapper::doStep(double stopTime)
 
   if (fmi2_fmu_kind_me == fmuKind)
   {
+    std::cout << "While loop starts" << std::endl;
     // main simulation loop
     fmi2_real_t hcur = hdef;
     fmi2_real_t tlast = tcur;
     while ((tcur < stopTime) && (!(eventInfo.terminateSimulation || terminateSimulation)))
     {
+      std::cout << "inside main simulationLoop" << tcur << std::endl;
       fmistatus = fmi2_import_set_time(fmu, tcur);
       if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_set_time failed");
 
@@ -874,12 +881,30 @@ void FMUWrapper::doStep(double stopTime)
       // step is complete
       fmistatus = fmi2_import_completed_integrator_step(fmu, fmi2_true, &callEventUpdate, &terminateSimulation);
       if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_completed_integrator_step failed");
-
+      //std::cout << "inside do step ME end " << tcur << std::endl;
       omsResultFile->emit(tcur);
+      model.resultFile->emitnew(tcur,instanceName);
     }
+    std::cout <<"While loop ends:" << instanceName << std::endl;
+    for(auto row : omsResultFile->data) {
+		std::cout << std::get<double>(row) << " is " << std::get<std::string>(row) << std::endl;
+	}
+  /*
+  std::map<double,std::vector<std::string>> ::iterator param;
+  for (param=model.resultFile->mapdata.begin(); param!=model.resultFile->mapdata.end(); ++param)
+  {
+     std::cout <<"Fmuwrapperarun" << "=" << param->first << std::endl;
+     std::vector<std::string> vallist = param->second;
+     for(std::string n : vallist) {
+        std::cout <<"FMUWrapperroger" << n << std::endl;
+    }
+  }
+    model.resultFile->mapdata.clear(); */
+   //omsResultFile->data.clear();
   }
   else if (fmi2_fmu_kind_cs == fmuKind)
   {
+    std::cout << "inside do step CS" << std::endl;
     while (tcur < stopTime)
     {
       fmistatus = fmi2_import_do_step(fmu, tcur, hdef, fmi2_true);

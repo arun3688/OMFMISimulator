@@ -36,7 +36,7 @@
 #include "DirectedGraph.h"
 #include "Settings.h"
 #include "Types.h"
-
+#include "Resultfile.h"
 #include <fmilib.h>
 #include <string>
 #include <map>
@@ -58,7 +58,7 @@ public:
   void describe();
   void exportXML(const char* filename);
   void importXML(const char* filename);
-
+  std::map<std::string, FMUWrapper*>& getFMUInstances();
   oms_status_t simulate();
   oms_status_t doSteps(const int numberOfSteps);
   oms_status_t stepUntil(const double timeValue);
@@ -66,7 +66,7 @@ public:
   void initialize();
   void terminate();
   void reset();
-
+  Resultfile *resultFile;
   oms_status_t getCurrentTime(double *time);
 
   Settings& getSettings() {return settings;}

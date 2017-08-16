@@ -35,21 +35,30 @@
 #include <string>
 #include <fstream>
 #include <fmilib.h>
+#include <map>
+#include <vector>
+#include <tuple>
 
+class CompositeModel;
 class Resultfile
 {
 public:
   Resultfile(std::string filename, fmi2_import_t* fmu);
+  Resultfile(std::string filename, CompositeModel* model,std::string test);
   ~Resultfile();
-
   void emit(double time);
-
+  void emitarun();
+  void emitnew(double time, std::string instancename);
+  void emitvalue();
+  std::map<double,std::vector<std::string>> mapdata;
+  std::vector<std::tuple<double,std::string>> data;
+  std::ofstream result;
 private:
   // Stop the compiler generating methods of copy the object
   Resultfile(Resultfile const& copy);            // Not Implemented
   Resultfile& operator=(Resultfile const& copy); // Not Implemented
-
   std::ofstream resultFile;
+  CompositeModel* model;
   fmi2_import_t* fmu;
 };
 

@@ -32,13 +32,15 @@
 #include "Resultfile.h"
 #include "Logging.h"
 #include "Util.h"
-
 #include <fmilib.h>
-
+#include "CompositeModel.h"
+#include "Variable.h"
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
 #include <string>
+#include <vector>
+#include <tuple>
 
 Resultfile::Resultfile(std::string filename, fmi2_import_t* fmu)
 {
@@ -60,16 +62,93 @@ Resultfile::Resultfile(std::string filename, fmi2_import_t* fmu)
   resultFile << std::endl;
 }
 
+Resultfile::Resultfile(std::string filename, CompositeModel* model, std::string test)
+{
+  this->model = model;
+
+  result.open(filename.c_str());
+  logDebug("Result file: " + filename);
+
+  result << "time";
+  std::cout << "inside Result file" << std::endl;
+  std::map<std::string, FMUWrapper*>::iterator it;
+  std::cout << "inside Result file1" << std::endl;
+  for (it=model->getFMUInstances().begin(); it != model->getFMUInstances().end(); it++)
+  {
+    std::vector<Variable> allVariables = it->second->getAllVariables();
+    for (int i=0; i<allVariables.size(); i++)
+      //if (fmi2_base_type_real == allVariables[i].baseType) // TODO: support other base types as well
+     // std::string value= allVariables[i].getvarname();
+      result << ", " << it->first+"."+allVariables[i].getvarname();
+      //std::cout <<"inside loop" << value << std::endl;
+      //std::cout << "inside for loop" << it->first<< allVariables[i].getvarname() << std::endl;
+  }
+  result << std::endl;
+}
+
 Resultfile::~Resultfile()
 {
   resultFile.close();
   logDebug("Result file closed");
 }
 
+void Resultfile::emitarun()
+{
+  double time;
+  model->getCurrentTime(&time);
+  result << time;
+  std::map<std::string, FMUWrapper*>::iterator it;
+  for (it=model->getFMUInstances().begin(); it != model->getFMUInstances().end(); it++)
+  {
+       std::vector<Variable> allVariables = it->second->getAllVariables();
+       for (int i=0; i<allVariables.size(); i++)
+         {
+          std::string value = toString(it->second->getReal(allVariables[i].getvarname()));
+          result << ", " << it->second->getReal(allVariables[i].getvarname());
+         }
+  }
+  result << std::endl;
+
+}
+
+
+void Resultfile::emitnew(double time, std::string instancename)
+{
+  //double time1;
+  //model->getCurrentTime(&time1);
+  std::cout << "inside emit_new " << time << std::endl;
+  //result << time;
+
+  std::map<std::string, FMUWrapper*>::iterator it;
+  std::vector<std::string> vals;
+  for (it=model->getFMUInstances().begin(); it != model->getFMUInstances().end(); it++)
+  {
+    if (it->first == instancename)
+     {
+       std::vector<Variable> allVariables = it->second->getAllVariables();
+       for (int i=0; i<allVariables.size(); i++)
+         {
+          std::string value = toString(it->second->getReal(allVariables[i].getvarname()));
+          vals.push_back(value);
+          //result << ", " << it->second->getReal(allVariables[i].getvarname());
+         }
+    }
+  }
+  //mapdata[time]=vals;
+  //mapdata.insert ( std::pair<double,>('z',500) );
+  /*
+  for(std::string n : vals) {
+        std::cout <<"arunnew" << time << "=" << n << std::endl;
+    }
+   */
+  //std::cout << "check new value system" <<
+}
+
 void Resultfile::emit(double time)
 {
+  std::cout << "inside emit " << time << std::endl;
   resultFile << time;
-
+  std::vector<std::string> val;
   fmi2_import_variable_list_t *list = fmi2_import_get_variable_list(fmu, 0);
   size_t nVar = fmi2_import_get_variable_list_size(list);
   for (size_t i = 0; i < nVar; ++i)
@@ -101,9 +180,33 @@ void Resultfile::emit(double time)
     // TODO: string
     else
       logWarning("Resultfile::emit: unsupported base type");
-
+    //data.emplace_back(time,value);
+    val.push_back(value);
     resultFile << ", " << value;
   }
-
+  /*
+  for(std::string n : val) {
+        std::cout <<"arun" << time << "=" << n << std::endl;
+    }*/
+  //mapdata[time]=val;
   resultFile << std::endl;
+}
+
+void Resultfile::emitvalue()
+{
+  std::cout << "inside emitvalue" << std::endl;
+
+  std::map<double,std::vector<std::string>> ::iterator param;
+  for (param=mapdata.begin(); param!=mapdata.end(); ++param)
+  {
+     std::cout <<"arun" << "=" << param->first << std::endl;
+     //result << param->first;
+     std::vector<std::string> vallist = param->second;
+     for(std::string n : vallist)
+     {
+        std::cout <<"roger" << n << std::endl;
+        //result << ", " << n;
+     }
+  //result << std::endl;
+  }
 }

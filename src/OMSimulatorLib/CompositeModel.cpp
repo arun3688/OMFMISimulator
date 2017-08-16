@@ -35,7 +35,7 @@
 #include "Settings.h"
 #include "Types.h"
 #include "Util.h"
-
+#include "Resultfile.h"
 #include <fmilib.h>
 #include <JM/jm_portability.h>
 
@@ -58,6 +58,7 @@ CompositeModel::CompositeModel()
   : fmuInstances()
 {
   logTrace();
+  resultFile =NULL;
   modelState = oms_modelState_instantiated;
 }
 
@@ -74,6 +75,11 @@ CompositeModel::~CompositeModel()
   std::map<std::string, FMUWrapper*>::iterator it;
   for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
     delete it->second;
+}
+
+std::map<std::string, FMUWrapper*>& CompositeModel::getFMUInstances()
+{
+  return fmuInstances;
 }
 
 void CompositeModel::instantiateFMU(const std::string& filename, const std::string& instanceName)
@@ -491,6 +497,7 @@ oms_status_t CompositeModel::doSteps(const int numberOfSteps)
     std::map<std::string, FMUWrapper*>::iterator it;
     for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
       it->second->doStep(tcur+communicationInterval);
+    // emit the current values for each fmus
     tcur += communicationInterval;
   }
 
@@ -511,15 +518,24 @@ oms_status_t CompositeModel::stepUntil(const double timeValue)
   {
     // input = output
     updateInputs(outputsGraph);
-
     tcur += communicationInterval;
     if (tcur > timeValue)
       tcur = timeValue;
-
     // do_step
     std::map<std::string, FMUWrapper*>::iterator it;
     for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
+    {
+      std::cout << "inside for loop "<< std::endl;
       it->second->doStep(tcur);
+      std::cout << "inside for loop after while loop ends "<< std::endl;
+     }
+    resultFile->emitarun();
+    //resultFile->mapdata.clear();
+     //std::cout << "end for Loop" << std::endl;
+     //resultFile->result << std::endl;
+    //resultFile->emitnew();
+    //std::cout << "inside step until" << std::endl;
+    //resultFile->emitnew();
   }
 
   return oms_status_ok;
@@ -536,7 +552,7 @@ void CompositeModel::initialize()
 
   tcur = settings.GetStartTime() ? *settings.GetStartTime() : 0.0;
   communicationInterval = settings.GetCommunicationInterval() ? *settings.GetCommunicationInterval() : 1e-1;
-
+  resultFile = new Resultfile("arun.csv",this,"test");
   // Enter initialization
   modelState = oms_modelState_initialization;
   std::map<std::string, FMUWrapper*>::iterator it;
@@ -544,10 +560,12 @@ void CompositeModel::initialize()
     it->second->enterInitialization(tcur);
 
   updateInputs(initialUnknownsGraph);
-
+  //resultFile->emitnew();
+  // generate result files
   // Exit initialization
   for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
     it->second->exitInitialization();
+  resultFile->emitarun();
   modelState = oms_modelState_simulation;
 }
 

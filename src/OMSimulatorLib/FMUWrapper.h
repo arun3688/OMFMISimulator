@@ -76,7 +76,7 @@ public:
 
   void SetSolverMethod(const std::string& solverMethod);
   std::string GetSolverMethodString();
-
+  std::vector<Variable> getAllVariables();
 private:
   enum Solver_t { NO_SOLVER, EXPLICIT_EULER, CVODE };
 

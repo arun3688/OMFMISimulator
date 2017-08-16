@@ -68,7 +68,7 @@ public:
   fmi2_base_type_enu_t& getBaseType() {return baseType;}
 
   bool isTypeReal() {return fmi2_base_type_real == baseType;}
-
+  std::string getvarname() {return name;}
 protected:
   std::string name;
   std::string fmuInstance;
