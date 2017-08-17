@@ -35,7 +35,7 @@
 #include "Settings.h"
 #include "Types.h"
 #include "Util.h"
-
+#include "Resultfile.h"
 #include <fmilib.h>
 #include <JM/jm_portability.h>
 
@@ -520,9 +520,19 @@ oms_status_t CompositeModel::stepUntil(const double timeValue)
     std::map<std::string, FMUWrapper*>::iterator it;
     for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
       it->second->doStep(tcur);
+
+    if (resultfilename!="")
+    {
+      omsResultFile->emitnew();
+    }
   }
 
   return oms_status_ok;
+}
+
+std::map<std::string, FMUWrapper*>& CompositeModel::getFMUInstances()
+{
+  return fmuInstances;
 }
 
 void CompositeModel::initialize()
@@ -536,7 +546,12 @@ void CompositeModel::initialize()
 
   tcur = settings.GetStartTime() ? *settings.GetStartTime() : 0.0;
   communicationInterval = settings.GetCommunicationInterval() ? *settings.GetCommunicationInterval() : 1e-1;
-
+  // create Result file
+  resultfilename= (settings.GetResultFile() ? settings.GetResultFile() :"");
+  if (resultfilename!="")
+  {
+    omsResultFile = new Resultfile(resultfilename, this);
+  }
   // Enter initialization
   modelState = oms_modelState_initialization;
   std::map<std::string, FMUWrapper*>::iterator it;
@@ -548,6 +563,10 @@ void CompositeModel::initialize()
   // Exit initialization
   for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
     it->second->exitInitialization();
+  if (resultfilename!="")
+  {
+      omsResultFile->emitnew();
+  }
   modelState = oms_modelState_simulation;
 }
 

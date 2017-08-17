@@ -298,6 +298,11 @@ FMUWrapper::FMUWrapper(CompositeModel& model, std::string fmuPath, std::string i
   #endif // BTH_DEACTIVATE_INITIAL_UNKNOWNS
 }
 
+std::vector<Variable> FMUWrapper::getAllVariables()
+{
+  return allVariables;
+}
+
 FMUWrapper::~FMUWrapper()
 {
   logTrace();

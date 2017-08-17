@@ -32,7 +32,8 @@
 #include "Resultfile.h"
 #include "Logging.h"
 #include "Util.h"
-
+#include "Variable.h"
+#include "CompositeModel.h"
 #include <fmilib.h>
 
 #include <iostream>
@@ -60,9 +61,28 @@ Resultfile::Resultfile(std::string filename, fmi2_import_t* fmu)
   resultFile << std::endl;
 }
 
+Resultfile::Resultfile(std::string filename, CompositeModel* model)
+{
+  this->model = model;
+  result.open(filename.c_str());
+  logDebug("Result file: " + filename);
+  result << "time";
+  std::map<std::string, FMUWrapper*>::iterator it;
+  for (it=model->getFMUInstances().begin(); it != model->getFMUInstances().end(); it++)
+  {
+    std::vector<Variable> allVariables = it->second->getAllVariables();
+    for (int i=0; i<allVariables.size(); i++)
+    {
+        result << ", " << it->first << "." << allVariables[i].getName();
+    }
+  }
+  result << std::endl;
+}
+
 Resultfile::~Resultfile()
 {
   resultFile.close();
+  result.close();
   logDebug("Result file closed");
 }
 
@@ -106,4 +126,32 @@ void Resultfile::emit(double time)
   }
 
   resultFile << std::endl;
+}
+
+void Resultfile::emitnew()
+{
+  double time;
+  model->getCurrentTime(&time);
+  result << time;
+  std::map<std::string, FMUWrapper*>::iterator it;
+  for (it=model->getFMUInstances().begin(); it != model->getFMUInstances().end(); it++)
+  {
+    std::vector<Variable> allVariables = it->second->getAllVariables();
+    for (int i=0; i<allVariables.size(); i++)
+    {
+      switch (allVariables[i].getBaseType())
+      {
+        case fmi2_base_type_real:
+          result << ", " << it->second->getReal(allVariables[i].getName());
+          break;
+        // case fmi2_base_type_int:
+        // case fmi2_base_type_bool:
+        // case fmi2_base_type_str:
+        // case fmi2_base_type_enum:
+        default:
+          logWarning("Resultfile::emitnew: unsupported base type");
+      }
+    }
+  }
+  result << std::endl;
 }

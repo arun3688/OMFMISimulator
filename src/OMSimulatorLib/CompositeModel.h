@@ -36,7 +36,7 @@
 #include "DirectedGraph.h"
 #include "Settings.h"
 #include "Types.h"
-
+#include "Resultfile.h"
 #include <fmilib.h>
 #include <string>
 #include <map>
@@ -62,7 +62,7 @@ public:
   oms_status_t simulate();
   oms_status_t doSteps(const int numberOfSteps);
   oms_status_t stepUntil(const double timeValue);
-
+  std::map<std::string, FMUWrapper*>& getFMUInstances();
   void initialize();
   void terminate();
   void reset();
@@ -81,6 +81,8 @@ private:
   std::map<std::string,double> ParameterList;
   DirectedGraph outputsGraph;
   DirectedGraph initialUnknownsGraph;
+  Resultfile *omsResultFile;
+  std::string resultfilename;
   double tcur;
   oms_modelState_t modelState;
   double communicationInterval;

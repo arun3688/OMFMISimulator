@@ -36,20 +36,23 @@
 #include <fstream>
 #include <fmilib.h>
 
+class CompositeModel;
 class Resultfile
 {
 public:
   Resultfile(std::string filename, fmi2_import_t* fmu);
+  Resultfile::Resultfile(std::string filename, CompositeModel* model);
   ~Resultfile();
-
+  void emitnew();
   void emit(double time);
 
 private:
   // Stop the compiler generating methods of copy the object
   Resultfile(Resultfile const& copy);            // Not Implemented
   Resultfile& operator=(Resultfile const& copy); // Not Implemented
-
+  CompositeModel* model;
   std::ofstream resultFile;
+  std::ofstream result;
   fmi2_import_t* fmu;
 };
 

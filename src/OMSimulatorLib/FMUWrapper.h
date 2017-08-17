@@ -70,6 +70,7 @@ public:
   std::string& getFMUPath() {return fmuPath;}
   std::string getFMUInstanceName() {return instanceName;}
   std::string getFMUKind();
+  std::vector<Variable> FMUWrapper::getAllVariables();
   bool isFMUKindME();
   std::string getGUID();
   std::string getGenerationTool();
