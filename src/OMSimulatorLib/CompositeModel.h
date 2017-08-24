@@ -55,11 +55,13 @@ public:
   double getReal(const std::string& var);
   void addConnection(const std::string& from, const std::string& to);
   void exportDependencyGraph(const std::string& prefix);
-
   void describe();
   void exportXML(const char* filename);
   void importXML(const char* filename);
-
+  void getallInputs();
+  void getallVariables();
+  void getallOutputs();
+  void getallParameters();
   oms_status_t simulate();
   oms_status_t doSteps(const int numberOfSteps);
   oms_status_t stepUntil(const double timeValue);
@@ -86,6 +88,8 @@ private:
   oms_modelState_t modelState;
   double communicationInterval;
   Clock clock;
+  std::string resultfilename;
+  Resultfile* resultfile;
 };
 
 #endif

@@ -133,6 +133,10 @@ void oms_describe(void* model);
 void oms_exportXML(void* model, const char* filename);
 void oms_importXML(void* model, const char* filename);
 void oms_exportDependencyGraph(void* model, const char* filename);
+void oms_getallVariables(void* model);
+void oms_getallInputs(void* model);
+void oms_getallOutputs(void* model);
+void oms_getallParameters(void* model);
 
 /**
  * \brief Initialize the simulation of a given model.

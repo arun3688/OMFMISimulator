@@ -186,6 +186,54 @@ static int OMSimulatorLua_describe(lua_State *L)
   return 0;
 }
 
+//void oms_getallVariables(void* model);
+static int OMSimulatorLua_getallVariables(lua_State *L)
+{
+  if (lua_gettop(L) != 1)
+    return luaL_error(L, "expecting exactly 1 argument");
+  luaL_checktype(L, 1, LUA_TUSERDATA);
+
+  void *model = topointer(L, 1);
+  oms_getallVariables(model);
+  return 0;
+}
+
+//void oms_getallInputs(void* model);
+static int OMSimulatorLua_getallInputs(lua_State *L)
+{
+  if (lua_gettop(L) != 1)
+    return luaL_error(L, "expecting exactly 1 argument");
+  luaL_checktype(L, 1, LUA_TUSERDATA);
+
+  void *model = topointer(L, 1);
+  oms_getallInputs(model);
+  return 0;
+}
+
+//void oms_getallOutputs(void* model);
+static int OMSimulatorLua_getallOutputs(lua_State *L)
+{
+  if (lua_gettop(L) != 1)
+    return luaL_error(L, "expecting exactly 1 argument");
+  luaL_checktype(L, 1, LUA_TUSERDATA);
+
+  void *model = topointer(L, 1);
+  oms_getallOutputs(model);
+  return 0;
+}
+
+//void oms_getallParameters(void* model);
+static int OMSimulatorLua_getallParameters(lua_State *L)
+{
+  if (lua_gettop(L) != 1)
+    return luaL_error(L, "expecting exactly 1 argument");
+  luaL_checktype(L, 1, LUA_TUSERDATA);
+
+  void *model = topointer(L, 1);
+  oms_getallParameters(model);
+  return 0;
+}
+
 //void oms_exportXML(void* model, const char* filename);
 static int OMSimulatorLua_exportXML(lua_State *L)
 {
@@ -429,5 +477,9 @@ DLLEXPORT int luaopen_OMSimulatorLua(lua_State *L)
   REGISTER_LUA_CALL(getVersion);
   REGISTER_LUA_CALL(exportXML);
   REGISTER_LUA_CALL(importXML);
+  REGISTER_LUA_CALL(getallVariables);
+  REGISTER_LUA_CALL(getallInputs);
+  REGISTER_LUA_CALL(getallOutputs);
+  REGISTER_LUA_CALL(getallParameters);
   return 0;
 }

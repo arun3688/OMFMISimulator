@@ -168,6 +168,58 @@ void oms_describe(void* model)
   pModel->describe();
 }
 
+void oms_getallVariables(void* model)
+{
+  logTrace();
+  if (!model)
+  {
+    logError("oms_getallInputs: invalid pointer");
+    return;
+  }
+
+  CompositeModel* pModel = (CompositeModel*)model;
+  pModel->getallVariables();
+}
+
+void oms_getallInputs(void* model)
+{
+  logTrace();
+  if (!model)
+  {
+    logError("oms_getallInputs: invalid pointer");
+    return;
+  }
+
+  CompositeModel* pModel = (CompositeModel*)model;
+  pModel->getallInputs();
+}
+
+void oms_getallOutputs(void* model)
+{
+  logTrace();
+  if (!model)
+  {
+    logError("oms_getallInputs: invalid pointer");
+    return;
+  }
+
+  CompositeModel* pModel = (CompositeModel*)model;
+  pModel->getallOutputs();
+}
+
+void oms_getallParameters(void* model)
+{
+  logTrace();
+  if (!model)
+  {
+    logError("oms_getallInputs: invalid pointer");
+    return;
+  }
+
+  CompositeModel* pModel = (CompositeModel*)model;
+  pModel->getallParameters();
+}
+
 void oms_exportXML(void* model, const char* filename)
 {
   logTrace();

@@ -36,7 +36,7 @@
 #include "Types.h"
 #include "Util.h"
 #include "Clock.h"
-
+#include "Resultfile.h"
 #include <fmilib.h>
 #include <JM/jm_portability.h>
 
@@ -60,6 +60,8 @@ CompositeModel::CompositeModel()
 {
   logTrace();
   modelState = oms_modelState_instantiated;
+  // create an dummy result object without filename
+  resultfile = new Resultfile("");
 }
 
 CompositeModel::CompositeModel(const char * descriptionPath)
@@ -383,6 +385,67 @@ void CompositeModel::importXML(const char* filename)
   }
 }
 
+void CompositeModel::getallVariables()
+{
+  std::map<std::string, FMUWrapper*>::iterator it;
+  for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
+  {
+    std::vector<Variable> allVariables = it->second->getAllVariables();
+    for (int j=0; j<allVariables.size(); j++)
+    {
+       resultfile->resultvariables.push_back(allVariables[j]);
+    }
+  }
+}
+
+void CompositeModel::getallInputs()
+{
+  std::map<std::string, FMUWrapper*>::iterator it;
+  for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
+  {
+    std::vector<Variable> allVariables = it->second->getAllVariables();
+    for (int j=0; j<allVariables.size(); j++)
+    {
+       if (allVariables[j].isInput())
+       {
+         resultfile->resultvariables.push_back(allVariables[j]);
+       }
+    }
+  }
+}
+
+void CompositeModel::getallOutputs()
+{
+  std::map<std::string, FMUWrapper*>::iterator it;
+  for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
+  {
+    std::vector<Variable> allVariables = it->second->getAllVariables();
+    for (int j=0; j<allVariables.size(); j++)
+    {
+       if (allVariables[j].isOutput())
+       {
+         resultfile->resultvariables.push_back(allVariables[j]);
+       }
+    }
+  }
+}
+
+void CompositeModel::getallParameters()
+{
+  std::map<std::string, FMUWrapper*>::iterator it;
+  for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
+  {
+    std::vector<Variable> allVariables = it->second->getAllVariables();
+    for (int j=0; j<allVariables.size(); j++)
+    {
+       if (allVariables[j].isParameter())
+       {
+         resultfile->resultvariables.push_back(allVariables[j]);
+       }
+    }
+  }
+}
+
 void CompositeModel::describe()
 {
   logTrace();
@@ -541,6 +604,10 @@ oms_status_t CompositeModel::stepUntil(const double timeValue)
     std::map<std::string, FMUWrapper*>::iterator it;
     for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
       it->second->doStep(tcur);
+    if(resultfilename!="")
+    {
+       resultfile->emitresultvalues(tcur);
+    }
   }
 
   return oms_status_ok;
@@ -559,7 +626,14 @@ void CompositeModel::initialize()
 
   tcur = settings.GetStartTime() ? *settings.GetStartTime() : 0.0;
   communicationInterval = settings.GetCommunicationInterval() ? *settings.GetCommunicationInterval() : 1e-1;
+  // create Result file
 
+  resultfilename= (settings.GetResultFile() ? settings.GetResultFile() :"");
+  if (resultfilename!="")
+  {
+    resultfile->resultfilename=resultfilename;
+    resultfile->emitresultvariables();
+  }
   // Enter initialization
   modelState = oms_modelState_initialization;
   std::map<std::string, FMUWrapper*>::iterator it;
@@ -571,6 +645,10 @@ void CompositeModel::initialize()
   // Exit initialization
   for (it=fmuInstances.begin(); it != fmuInstances.end(); it++)
     it->second->exitInitialization();
+  if (resultfilename!="")
+  {
+    resultfile->emitresultvalues(tcur);
+  }
   modelState = oms_modelState_simulation;
 }
 

@@ -35,22 +35,23 @@
 #include <string>
 #include <fstream>
 #include <fmilib.h>
+#include "Variable.h"
 
 class Resultfile
 {
 public:
-  Resultfile(std::string filename, fmi2_import_t* fmu);
+  Resultfile(std::string filename);
   ~Resultfile();
-
-  void emit(double time);
+  std::vector<Variable> resultvariables;
+  std::string resultfilename="";
+  void emitresultvariables();
+  void emitresultvalues(double time);
 
 private:
   // Stop the compiler generating methods of copy the object
   Resultfile(Resultfile const& copy);            // Not Implemented
   Resultfile& operator=(Resultfile const& copy); // Not Implemented
-
   std::ofstream resultFile;
-  fmi2_import_t* fmu;
-};
+  };
 
 #endif

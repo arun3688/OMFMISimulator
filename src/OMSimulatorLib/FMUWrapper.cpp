@@ -549,14 +549,14 @@ void FMUWrapper::enterInitialization(double startTime)
 void FMUWrapper::exitInitialization()
 {
   fmi2_status_t fmistatus;
-
+ /*
   const char* resultFile = model.getSettings().GetResultFile();
   std::string finalResultFile;
   if (resultFile)
     finalResultFile = std::string(resultFile) + "_" + instanceName + "_res.csv";
   else
     finalResultFile = instanceName + "_res.csv";
-  logDebug("result file: " + finalResultFile);
+  logDebug("result file: " + finalResultFile); */
 
   if (fmi2_fmu_kind_me == fmuKind)
   {
@@ -564,7 +564,7 @@ void FMUWrapper::exitInitialization()
     if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_exit_initialization_mode failed");
 
     terminateSimulation = fmi2_false;
-    omsResultFile = new Resultfile(finalResultFile, fmu);
+    //omsResultFile = new Resultfile(finalResultFile, fmu);
 
     eventInfo.newDiscreteStatesNeeded = fmi2_false;
     eventInfo.terminateSimulation = fmi2_false;
@@ -576,7 +576,7 @@ void FMUWrapper::exitInitialization()
     // fmi2_import_exit_initialization_mode leaves FMU in event mode
     do_event_iteration();
     fmi2_import_enter_continuous_time_mode(fmu);
-    omsResultFile->emit(tcur);
+    //omsResultFile->emit(tcur);
 
     callEventUpdate = fmi2_false;
 
@@ -692,8 +692,8 @@ void FMUWrapper::exitInitialization()
     fmistatus = fmi2_import_exit_initialization_mode(fmu);
     if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_exit_initialization_mode failed");
 
-    omsResultFile = new Resultfile(finalResultFile, fmu);
-    omsResultFile->emit(tcur);
+    //omsResultFile = new Resultfile(finalResultFile, fmu);
+    //omsResultFile->emit(tcur);
   }
   else
     logFatal("Unsupported FMU kind");
@@ -745,7 +745,7 @@ void FMUWrapper::terminate()
     free(states_der);
     free(states_nominal);
   }
-  if (omsResultFile) delete omsResultFile;
+  //if (omsResultFile) delete omsResultFile;
 
   fmi2_status_t fmistatus = fmi2_import_terminate(fmu);
   if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_terminate failed");
@@ -775,7 +775,7 @@ void FMUWrapper::reset()
     free(states_der);
     free(states_nominal);
   }
-  if (omsResultFile) delete omsResultFile;
+  //if (omsResultFile) delete omsResultFile;
 
   fmi2_status_t fmistatus = fmi2_import_reset(fmu);
   if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_reset failed");
@@ -836,7 +836,7 @@ void FMUWrapper::doStep(double stopTime)
         }
         fmistatus = fmi2_import_get_event_indicators(fmu, event_indicators, n_event_indicators);
         if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_get_event_indicators failed");
-        omsResultFile->emit(tcur);
+        //omsResultFile->emit(tcur);
 
         if (CVODE == solverMethod)
         {
@@ -898,7 +898,7 @@ void FMUWrapper::doStep(double stopTime)
       fmistatus = fmi2_import_completed_integrator_step(fmu, fmi2_true, &callEventUpdate, &terminateSimulation);
       if (fmi2_status_ok != fmistatus) logFatal("fmi2_import_completed_integrator_step failed");
 
-      omsResultFile->emit(tcur);
+      //omsResultFile->emit(tcur);
     }
   }
   else if (fmi2_fmu_kind_cs == fmuKind || fmi2_fmu_kind_me_and_cs == fmuKind)
@@ -907,7 +907,7 @@ void FMUWrapper::doStep(double stopTime)
     {
       fmistatus = fmi2_import_do_step(fmu, tcur, hdef, fmi2_true);
       tcur += hdef;
-      omsResultFile->emit(tcur);
+      //omsResultFile->emit(tcur);
     }
   }
 }
