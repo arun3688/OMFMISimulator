@@ -80,6 +80,18 @@ ELSE()
 ENDIF()
 find_package(KINSOLLibrary REQUIRED)
 
+find_package(PythonLibs)
+
+IF (PYTHONLIBS_FOUND)
+   message(STATUS "found Python")
+   message(STATUS " PYTHON_VERSION:  " ${PYTHONLIBS_VERSION_STRING})
+   message(STATUS " PYTHON_LIBRARIES:  " ${PYTHON_LIBRARIES})
+   message(STATUS " PYTHON_INCLUDE_DIRS:  " ${PYTHON_INCLUDE_DIRS})
+ELSE()
+	MESSAGE(WARNING, "Python library not found, if python installed set the path in environment variable for cmake to find python libs")
+ENDIF()
+
+
 set(PUGIXML_INCLUDEDIR ${PROJECT_SOURCE_DIR}/3rdParty/PugiXml)
 
 option(OMFIT "Enable the OMFIT module for parameter estimation support." OFF)
@@ -110,6 +122,7 @@ ENDIF()
 add_subdirectory(src/OMSimulatorLib)
 add_subdirectory(src/OMSimulator)
 add_subdirectory(src/OMSimulatorLua)
+add_subdirectory(src/OMSimulatorPython)
 add_subdirectory(src/OMSimulatorModelica)
 
 ##########################
