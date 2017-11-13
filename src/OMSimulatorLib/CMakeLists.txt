@@ -1,6 +1,11 @@
 project(OMSimulatorLib)
-
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
+
+## To export the symbols to DLL in windows
+IF (WIN32)
+   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+   add_definitions(-DBOOST_ALL_DYN_LINK)
+ENDIF()
 
 list(APPEND OMSIMULATORLIB_SOURCES Clock.cpp)
 list(APPEND OMSIMULATORLIB_SOURCES Clocks.cpp)
