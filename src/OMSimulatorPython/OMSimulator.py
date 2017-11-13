@@ -4,9 +4,9 @@ import ctypes,sys
 class OMSimulator:
      def __init__(self):
          if (sys.platform == 'win32'):
-            self.obj=cdll.LoadLibrary("../../install/lib/OMSimulatorLib.dll")
+            self.obj=cdll.LoadLibrary("OMSimulatorLib.dll")
          else:
-            self.obj=cdll.LoadLibrary("../../install/lib/libOMSimulatorLib.so")
+            self.obj=cdll.LoadLibrary("./libOMSimulatorLib.so")
          self.setCtypesArguments()
          self.setResultTypes()
       
