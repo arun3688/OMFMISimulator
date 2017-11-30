@@ -6,7 +6,7 @@ class OMSimulator:
          if (sys.platform == 'win32'):
             self.obj=cdll.LoadLibrary("OMSimulatorLib.dll")
          else:
-            self.obj=cdll.LoadLibrary("./libOMSimulatorLib.so")
+            self.obj=cdll.LoadLibrary("libOMSimulatorLib.so")
          self.setCtypesArguments()
          self.setResultTypes()
       

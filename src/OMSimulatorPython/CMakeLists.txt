@@ -1,3 +1,7 @@
 project(OMSimulatorPython)
 set(OMSimulatorPythonResources ${CMAKE_SOURCE_DIR}/install/lib)
+set(OMSimulatorPythonLinuxScript ${CMAKE_SOURCE_DIR}/install/bin)
+set(OMSimulatorPythonWindowsScript ${CMAKE_SOURCE_DIR}/install/bin)
 install(FILES OMSimulator.py DESTINATION ${OMSimulatorPythonResources})
+install(FILES OMSimulatorPython.sh DESTINATION ${OMSimulatorPythonLinuxScript} PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ)
+install(FILES OMSimulatorPython.bat DESTINATION ${OMSimulatorPythonWindowsScript} PERMISSIONS  OWNER_EXECUTE OWNER_WRITE OWNER_READ)
