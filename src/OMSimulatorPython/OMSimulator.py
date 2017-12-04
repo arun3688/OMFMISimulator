@@ -66,13 +66,13 @@ class OMSimulator:
          return self.obj.oms_newModel()
      
      def loadModel(self,filename):
-         return self.obj.oms_loadModel(filename)
+         return self.obj.oms_loadModel(str.encode(filename))
          
      def instantiateFMU(self, model, filename, instanceName):      
-         self.obj.oms_instantiateFMU(model, filename, instanceName)         
+         self.obj.oms_instantiateFMU(model, str.encode(filename), str.encode(instanceName))         
       
      def instantiateTable(self, model, filename, instanceName):      
-         self.obj.oms_instantiateTable(model, filename, instanceName)       
+         self.obj.oms_instantiateTable(model, str.encode(filename), str.encode(instanceName))       
          
      def describe(self, model):
          self.obj.oms_describe(model)  
@@ -93,19 +93,19 @@ class OMSimulator:
          self.obj.oms_simulate(model)   
          
      def addConnection(self, model, fromconnection, toconnection):
-         self.obj.oms_addConnection(model,fromconnection,toconnection)
+         self.obj.oms_addConnection(model,str.encode(fromconnection),str.encode(toconnection))
       
      def importXML(self, model, filename):
-         self.obj.oms_importXML(model,filename)
+         self.obj.oms_importXML(model,str.encode(filename))
 
      def exportXML(self, model, filename):
-         self.obj.oms_exportXML(model,filename)
+         self.obj.oms_exportXML(model,str.encode(filename))
  
      def exportDependencyGraph(self, model, filename):
-         self.obj.oms_exportDependencyGraph(model,filename)
+         self.obj.oms_exportDependencyGraph(model,str.encode(filename))
 
      def exportCompositeStructure(self, model, filename):
-         self.obj.oms_exportCompositeStructure(model,filename)
+         self.obj.oms_exportCompositeStructure(model,str.encode(filename))
      
      def getCurrentTime(self, model):
          time=ctypes.c_double()
@@ -122,31 +122,31 @@ class OMSimulator:
          return self.obj.oms_getVersion()
          
      def getBoolean(self, model, var):
-         return self.obj.oms_getBoolean(model,var)
+         return self.obj.oms_getBoolean(model,str.encode(var))
 
      def getInteger(self, model, var):
-         return self.obj.oms_getInteger(model,var) 
+         return self.obj.oms_getInteger(model,str.encode(var)) 
      
      def getReal(self, model, var):
-         return self.obj.oms_getReal(model,var)
+         return self.obj.oms_getReal(model,str.encode(var))
          
      def setBoolean(self, model, var, value):
-         self.obj.oms_setBoolean(model,var,value)
+         self.obj.oms_setBoolean(model,str.encode(var),value)
 
      def setInteger(self, model, var, value):
-         self.obj.oms_setInteger(model,var,value)
+         self.obj.oms_setInteger(model,str.encode(var),value)
       
      def setReal(self, model, var, value):
-         self.obj.oms_setReal(model,var,value)      
+         self.obj.oms_setReal(model,str.encode(var),value)      
         
      def setResultFile(self, model, filename):
-         self.obj.oms_setResultFile(model,filename)
+         self.obj.oms_setResultFile(model,str.encode(filename))
 
      def setTempDirectory(self, filename):
-        self.obj.oms_setTempDirectory(filename)
+        self.obj.oms_setTempDirectory(str.encode(filename))
 
      def setWorkingDirectory(self, path):
-        self.obj.oms_setWorkingDirectory(path)
+        self.obj.oms_setWorkingDirectory(str.encode(path))
     
      def setStartTime(self, model, startTime):
         self.obj.oms_setStartTime(model, startTime)
@@ -161,16 +161,16 @@ class OMSimulator:
         self.obj.oms_setCommunicationInterval(model, CommunicationInterval)
         
      def setSolverMethod(self, model, instanceName, method):
-        self.obj.oms_setSolverMethod(model, instanceName, method)
+        self.obj.oms_setSolverMethod(model, str.encode(instanceName), str.encode(method))
 
      def setLogFile(self, filename):
-        self.obj.oms_setLogFile(filename)
+        self.obj.oms_setLogFile(str.encode(filename))
 
      def compareSimulationResults(self, filenameA, filenameB, var, relTol, absTol):
-        return self.obj.oms_compareSimulationResults(filenameA, filenameB, var, relTol, absTol)
+        return self.obj.oms_compareSimulationResults(str.encode(filenameA), str.encode(filenameB), str.encode(var), relTol, absTol)
 
      def setVariableFilter(self, model, instanceFilter, variableFilter):
-        self.obj.oms_setVariableFilter(model, instanceFilter, variableFilter)
+        self.obj.oms_setVariableFilter(model, str.encode(instanceFilter), str.encode(variableFilter))
    
      def getNumberOfInterfaces(self, model):
         return self.obj.oms_getNumberOfInterfaces(model)
